@@ -28,6 +28,9 @@ import MovieList from "./MovieList";
 import Carousel from "./Carousel";
 import { LayoutOptions } from "./LayoutOptions";
 import ShowcaseApp from "./ShowcaseApp";
+import { CustomIndicatorExample } from "./CustomIndicatorExample";
+import { RefBasedIndicatorExample } from "./RefBasedIndicatorExample";
+import { IndicatorComparisonExample } from "./IndicatorComparisonExample";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -97,6 +100,21 @@ const NavigationTree = () => {
             name="ShowcaseApp"
             component={ShowcaseApp}
             options={{ title: "Showcase App" }}
+          />
+          <Stack.Screen
+            name="CustomIndicatorExample"
+            component={CustomIndicatorExample}
+            options={{ title: "Custom Indicator Example" }}
+          />
+          <Stack.Screen
+            name="RefBasedIndicatorExample"
+            component={RefBasedIndicatorExample}
+            options={{ title: "Ref-Based Indicator Example" }}
+          />
+          <Stack.Screen
+            name="IndicatorComparisonExample"
+            component={IndicatorComparisonExample}
+            options={{ title: "Indicator Comparison Example" }}
           />
         </Stack.Group>
         <Stack.Screen name="Masonry" component={Masonry} />

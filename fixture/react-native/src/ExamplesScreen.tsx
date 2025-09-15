@@ -91,6 +91,18 @@ export const ExamplesScreen = () => {
       title: "Showcase App",
       destination: "ShowcaseApp",
     },
+    {
+      title: "Custom Indicator Example",
+      destination: "CustomIndicatorExample",
+    },
+    {
+      title: "Ref-Based Indicator Example",
+      destination: "RefBasedIndicatorExample",
+    },
+    {
+      title: "Indicator Comparison Example",
+      destination: "IndicatorComparisonExample",
+    },
   ];
   return (
     <>

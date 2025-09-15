@@ -434,4 +434,6 @@ export interface FlashListProps<TItem>
    * Doing set state inside the callback can lead to infinite loops. Make sure FlashList's props are memoized.
    */
   onCommitLayoutEffect?: () => void;
+
+  onEngagedIndicesChanged?: (startIndex: number, endIndex: number) => void;
 }

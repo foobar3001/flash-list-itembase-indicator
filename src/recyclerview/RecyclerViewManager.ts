@@ -259,22 +259,23 @@ export class RecyclerViewManager<T> {
   modifyChildrenLayout(
     layoutInfo: RVLayoutInfo[],
     dataLength: number
-  ): boolean {
+  ): [boolean, ConsecutiveNumbers | undefined] {
     this.layoutManager?.modifyLayout(layoutInfo, dataLength);
     if (dataLength === 0) {
-      return false;
+      return [false, undefined];
     }
     if (this.layoutManager?.requiresRepaint) {
       // console.log("requiresRepaint triggered");
       this.layoutManager.requiresRepaint = false;
-      return true;
+      return [true, undefined];
     }
     if (this.hasRenderedProgressively) {
-      return this.recomputeEngagedIndices() !== undefined;
+      const newEngagedIndices = this.recomputeEngagedIndices();
+      return [newEngagedIndices !== undefined, newEngagedIndices];
     } else {
       this.renderProgressively();
     }
-    return !this.hasRenderedProgressively;
+    return [!this.hasRenderedProgressively, undefined];
   }
 
   computeItemViewability() {

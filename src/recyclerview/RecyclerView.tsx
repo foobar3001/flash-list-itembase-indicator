@@ -208,9 +208,17 @@ const RecyclerViewComponent = <T,>(
       return { index, dimensions: layout };
     });
 
-    if (
-      recyclerViewManager.modifyChildrenLayout(layoutInfo, data?.length ?? 0)
-    ) {
+    const [result, engagedIndices] = recyclerViewManager.modifyChildrenLayout(
+      layoutInfo,
+      data?.length ?? 0
+    );
+    if (engagedIndices) {
+      props.onEngagedIndicesChanged?.(
+        engagedIndices.startIndex,
+        engagedIndices.endIndex
+      );
+    }
+    if (result) {
       // Trigger re-render if layout modifications were made
       setRenderId((prev) => prev + 1);
     } else {
@@ -258,7 +266,15 @@ const RecyclerViewComponent = <T,>(
             recyclerViewManager.resetVelocityCompute();
           }
           // Update scroll position and trigger re-render if needed
-          if (recyclerViewManager.updateScrollOffset(scrollOffset, velocity)) {
+          const newEngagedIndices = recyclerViewManager.updateScrollOffset(
+            scrollOffset,
+            velocity
+          );
+          if (newEngagedIndices) {
+            props.onEngagedIndicesChanged?.(
+              newEngagedIndices.startIndex,
+              newEngagedIndices.endIndex
+            );
             setRenderId((prev) => prev + 1);
           }
         }
