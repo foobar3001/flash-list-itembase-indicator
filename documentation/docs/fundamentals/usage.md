@@ -31,13 +31,21 @@ const MyList = () => {
 };
 ```
 
-To avoid common pitfalls, you can also follow these steps for migrating from `FlatList`, based on our own experiences:
+## Important things to know {#migration-steps}
 
-1. Switch from `FlatList` to `FlashList`.
-2. **Important**: Scan your [`renderItem`](#renderitem) hierarchy for explicit `key` prop definitions and remove them. If you're doing a `.map()` use our hook called [`useMappingHelper`](https://shopify.github.io/flash-list/docs/usage/#usemappinghelper).
-3. Check your [`renderItem`](#renderitem) hierarchy for components that make use of `useState` and verify whether that state would need to be reset if a different item is passed to that component (see [Recycling](https://shopify.github.io/flash-list/docs/recycling))
-4. If your list has heterogenous views, pass their types to `FlashList` using [`getItemType`](#getitemtype) prop to improve performance.
-5. Do not test performance with JS dev mode on. Make sure you're in release mode. `FlashList` can appear slower while in dev mode due to a small render buffer.
+To avoid common pitfalls, you can also follow these steps for migrating from `FlatList`, based on our own experience.
+
+1. Simply change from `FlatList` to `FlashList` and render the list.
+2. **Important**: Scan your [`renderItem`](https://shopify.github.io/flash-list/docs/usage/#renderitem) hierarchy for explicit `key` prop definitions and remove them. If you’re doing a `.map()` use our hook called [`useMappingHelper`](https://shopify.github.io/flash-list/docs/usage/#usemappinghelper).
+3. Check your [`renderItem`](https://shopify.github.io/flash-list/docs/usage/#renderitem) hierarchy for components that make use of `useState` and verify whether that state would need to be reset if a different item is passed to that component (see [Recycling](https://shopify.github.io/flash-list/docs/recycling))
+4. If your list has heterogenous views, pass their types to `FlashList` using [`getItemType`](https://shopify.github.io/flash-list/docs/usage/#getitemtype) prop to improve performance.
+5. Do not test performance with JS dev mode on. Make sure you’re in release mode. `FlashList` can appear slower while in dev mode due to a small render buffer.
+6. Memoizing props passed to FlashList is more important in v2. v1 was more selective about updating items, but this was often perceived as a bug by developers. We will not follow that approach and will instead allow developers to ensure that props are memoized. We will stop re-renders of children wherever it is obvious.
+7. `keyExtractor` is important to prevent glitches due to item layout changes when going upwards. We highly recommend having a valid `keyExtractor` with v2.
+8. Read about new hooks that simplify recycling and reacting to layout changes: [`useLayoutState`](https://shopify.github.io/flash-list/docs/usage/#usemappinghelper), [`useRecyclingState`](https://shopify.github.io/flash-list/docs/usage/#usemappinghelper)
+9. If you're nesting horizontal FlashLists in vertical lists, we highly recommend the vertical list to be FlashList too. We have optimizations to wait for child layout to complete which can improve load times.
+
+# Props
 
 ### **`renderItem`**
 
@@ -181,14 +189,6 @@ export type ContentStyle = Pick<
 ```
 
 You can use `contentContainerStyle` to apply padding that will be applied to the whole content itself. For example, you can apply this padding, so that all of your items have leading and trailing space.
-
-### `disableRecycling`
-
-```tsx
-disableRecycling?: boolean;
-```
-
-If true, the FlashList will not recycle items, which can be useful for debugging or in specific scenarios where recycling causes issues. We don't recommend disabling recycling.
 
 ### `drawDistance`
 
@@ -348,7 +348,7 @@ How far from the end (in units of visible length of the list) the bottom edge of
 onLoad: (info: { elapsedTimeInMs: number }) => void;
 ```
 
-This event is raised once the list has drawn items on the screen. It also reports elapsedTimeInMs which is the time it took to draw the items. This is required because FlashList doesn't render items in the first cycle. Items are drawn after it measures itself at the end of first render. If you're using ListEmptyComponent, this event is raised as soon as ListEmptyComponent is rendered.
+This event is raised once the list has drawn items on the screen. It also reports elapsedTimeInMs which is the time it took to draw the items. This is required because FlashList doesn't render items in the first cycle. Items are drawn after it measures itself at the end of first render. Please note that the event is not fired if ListEmptyComponent is rendered.
 
 ### `onRefresh`
 

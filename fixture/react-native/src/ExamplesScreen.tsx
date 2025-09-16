@@ -1,5 +1,12 @@
 import React from "react";
-import { StatusBar, StyleSheet, FlatList, Text, Pressable } from "react-native";
+import {
+  StatusBar,
+  StyleSheet,
+  FlatList,
+  Text,
+  Pressable,
+  View,
+} from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
 
@@ -92,6 +99,18 @@ export const ExamplesScreen = () => {
       destination: "ShowcaseApp",
     },
     {
+      title: "Lot of Items",
+      destination: "LotOfItems",
+    },
+    {
+      title: "Manual FlashList Benchmark Example",
+      destination: "ManualBenchmarkExample",
+    },
+    {
+      title: "Manual FlatList Benchmark Example",
+      destination: "ManualFlatListBenchmarkExample",
+    },
+    {
       title: "Custom Indicator Example",
       destination: "CustomIndicatorExample",
     },
@@ -123,6 +142,7 @@ export const ExamplesScreen = () => {
             <Text style={styles.rowTitle}>{item.title}</Text>
           </Pressable>
         )}
+        ListFooterComponent={<View style={{ height: 100 }} />}
       />
       <DebugButton onPress={onDebugButton} />
     </>

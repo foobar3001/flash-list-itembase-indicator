@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Text, StyleSheet, SafeAreaView, Switch } from "react-native";
-import { FlashList, ViewToken } from "@shopify/flash-list";
+import { FlashList, FlashListRef, ViewToken } from "@shopify/flash-list";
 
 interface DataItem {
   id: string;
@@ -88,7 +88,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ item, index }) => {
 };
 
 export const IndicatorComparisonExample: React.FC = () => {
-  const flashListRef = useRef<FlashList<DataItem>>(null);
+  const flashListRef = useRef<FlashListRef<DataItem>>(null);
   const [mode, setMode] = useState<"callback" | "ref">("callback");
 
   // Callback モードのデータ
@@ -199,7 +199,6 @@ export const IndicatorComparisonExample: React.FC = () => {
         renderItem={({ item, index }) => (
           <MessageItem item={item} index={index} />
         )}
-        estimatedItemSize={100}
         keyExtractor={(item) => item.id}
         onViewableItemsChanged={
           mode === "callback" ? handleViewableItemsChanged : undefined

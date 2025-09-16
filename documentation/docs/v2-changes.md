@@ -169,7 +169,15 @@ const NestedList = ({ items }) => {
 
 Exposes helpers to easily access `ref` of FlashList. It also exposes `ref` of ScrollView. Ideal for use within child components or `CellRendererComponent`.
 
-## Deprecated (will be removed after alpha/beta)
+## New helper components
+
+### LayoutCommitObserver
+
+A component that observes when FlashList commits a layout. This is particularly useful when you have one or more FlashLists somewhere down the component tree and need to know when all of them have finished their layout commit.
+
+Read more [here.](./fundamentals/layout-commit-observer.md)
+
+## Deprecated
 
 - `estimatedItemSize`: No longer used.
 - `estimatedListSize`: No longer used.

@@ -28,6 +28,8 @@ import MovieList from "./MovieList";
 import Carousel from "./Carousel";
 import { LayoutOptions } from "./LayoutOptions";
 import ShowcaseApp from "./ShowcaseApp";
+import ManualBenchmarkExample from "./ManualBenchmarkExample";
+import ManualFlatListBenchmarkExample from "./ManualFlatListBenchmarkExample";
 import { CustomIndicatorExample } from "./CustomIndicatorExample";
 import { RefBasedIndicatorExample } from "./RefBasedIndicatorExample";
 import { IndicatorComparisonExample } from "./IndicatorComparisonExample";
@@ -101,21 +103,6 @@ const NavigationTree = () => {
             component={ShowcaseApp}
             options={{ title: "Showcase App" }}
           />
-          <Stack.Screen
-            name="CustomIndicatorExample"
-            component={CustomIndicatorExample}
-            options={{ title: "Custom Indicator Example" }}
-          />
-          <Stack.Screen
-            name="RefBasedIndicatorExample"
-            component={RefBasedIndicatorExample}
-            options={{ title: "Ref-Based Indicator Example" }}
-          />
-          <Stack.Screen
-            name="IndicatorComparisonExample"
-            component={IndicatorComparisonExample}
-            options={{ title: "Indicator Comparison Example" }}
-          />
         </Stack.Group>
         <Stack.Screen name="Masonry" component={Masonry} />
         <Stack.Screen name="ComplexMasonry" component={ComplexMasonry} />
@@ -124,6 +111,31 @@ const NavigationTree = () => {
           name="CellRendererExamples"
           component={FlashListCellRenderer}
           options={{ title: "CellRenderer Examples" }}
+        />
+        <Stack.Screen
+          name="ManualBenchmarkExample"
+          component={ManualBenchmarkExample}
+          options={{ title: "Manual Flash List Benchmark Example" }}
+        />
+        <Stack.Screen
+          name="ManualFlatListBenchmarkExample"
+          component={ManualFlatListBenchmarkExample}
+          options={{ title: "Manual Flat List Benchmark Example" }}
+        />
+        <Stack.Screen
+          name="CustomIndicatorExample"
+          component={CustomIndicatorExample}
+          options={{ title: "Custom Indicator Example" }}
+        />
+        <Stack.Screen
+          name="RefBasedIndicatorExample"
+          component={RefBasedIndicatorExample}
+          options={{ title: "Ref-Based Indicator Example" }}
+        />
+        <Stack.Screen
+          name="IndicatorComparisonExample"
+          component={IndicatorComparisonExample}
+          options={{ title: "Indicator Comparison Example" }}
         />
         <Stack.Group screenOptions={{ presentation: "modal" }}>
           <Stack.Screen name="Debug" component={DebugScreen} />

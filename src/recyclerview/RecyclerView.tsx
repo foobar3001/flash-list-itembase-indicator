@@ -20,6 +20,8 @@ import {
 } from "react-native";
 
 import { FlashListRef } from "../FlashListRef";
+import { ErrorMessages } from "../errors/ErrorMessages";
+import { WarningMessages } from "../errors/WarningMessages";
 
 import { RVDimension } from "./layout-managers/LayoutManager";
 import {
@@ -208,22 +210,42 @@ const RecyclerViewComponent = <T,>(
       return { index, dimensions: layout };
     });
 
+    const hasExceededMaxRendersWithoutCommit =
+      renderTimeTracker.hasExceededMaxRendersWithoutCommit();
+
+    if (hasExceededMaxRendersWithoutCommit) {
+      console.warn(WarningMessages.exceededMaxRendersWithoutCommit);
+    }
+
     const [result, engagedIndices] = recyclerViewManager.modifyChildrenLayout(
       layoutInfo,
       data?.length ?? 0
     );
-    if (engagedIndices) {
-      props.onEngagedIndicesChanged?.(
-        engagedIndices.startIndex,
-        engagedIndices.endIndex
-      );
-    }
-    if (result) {
+
+    if (result && !hasExceededMaxRendersWithoutCommit) {
+      if (engagedIndices) {
+        props.onEngagedIndicesChanged?.(
+          engagedIndices.startIndex,
+          engagedIndices.endIndex
+        );
+      }
+
       // Trigger re-render if layout modifications were made
       setRenderId((prev) => prev + 1);
     } else {
       viewHolderCollectionRef.current?.commitLayout();
       applyOffsetCorrection();
+    }
+
+    if (
+      horizontal &&
+      recyclerViewManager.hasLayout() &&
+      recyclerViewManager.getWindowSize().height > 0
+    ) {
+      // We want the parent FlashList to continue rendering the next batch of items as soon as height is available.
+      // Waiting for each horizontal list to finish might cause too many setState calls.
+      // This will help avoid "Maximum update depth exceeded" error.
+      parentRecyclerViewContext?.unmarkChildLayoutAsPending(recyclerViewId);
     }
   });
 
@@ -400,6 +422,9 @@ const RecyclerViewComponent = <T,>(
       stickyHeaderIndices &&
       stickyHeaderIndices.length > 0
     ) {
+      if (horizontal) {
+        throw new Error(ErrorMessages.stickyHeadersNotSupportedForHorizontal);
+      }
       return (
         <StickyHeaders
           stickyHeaderIndices={stickyHeaderIndices}
@@ -418,6 +443,7 @@ const RecyclerViewComponent = <T,>(
     stickyHeaderIndices,
     renderItem,
     scrollY,
+    horizontal,
     recyclerViewManager,
     extraData,
   ]);
@@ -481,11 +507,13 @@ const RecyclerViewComponent = <T,>(
   return (
     <RecyclerViewContextProvider value={recyclerViewContext}>
       <CompatView
-        style={{
-          flex: horizontal ? undefined : 1,
-          overflow: "hidden",
-          ...style,
-        }}
+        style={[
+          {
+            flex: horizontal ? undefined : 1,
+            overflow: "hidden",
+          },
+          style,
+        ]}
         ref={internalViewRef}
         collapsable={false}
         onLayout={(event) => {

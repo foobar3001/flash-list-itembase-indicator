@@ -260,7 +260,6 @@ export const CustomIndicatorExample: React.FC = () => {
         }}
         data={DATA}
         renderItem={({ item }) => <ItemComponent item={item} />}
-        estimatedItemSize={120} // 平均的な高さを設定
         keyExtractor={(item) => item.id}
         onEngagedIndicesChanged={(startIndex, endIndex) => {
           console.log("Engaged indices:", startIndex, endIndex);
@@ -290,10 +289,6 @@ export const CustomIndicatorExample: React.FC = () => {
           handleScrollEnd();
         }}
         showsVerticalScrollIndicator={false} // 標準のスクロールバーを非表示
-        // アイテムの実際の高さを事前に計算できる場合は overrideItemLayout を使用
-        overrideItemLayout={(layout, item) => {
-          layout.size = item.height;
-        }}
       />
     </SafeAreaView>
   );

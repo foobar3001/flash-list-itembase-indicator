@@ -35,4 +35,7 @@ export type RootStackParamList = {
   CustomIndicatorExample: undefined;
   RefBasedIndicatorExample: undefined;
   IndicatorComparisonExample: undefined;
+  LotOfItems: undefined;
+  ManualBenchmarkExample: undefined;
+  ManualFlatListBenchmarkExample: undefined;
 };

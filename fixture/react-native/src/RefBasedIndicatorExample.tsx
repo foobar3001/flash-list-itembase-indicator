@@ -7,7 +7,7 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, FlashListRef } from "@shopify/flash-list";
 
 interface DataItem {
   id: string;
@@ -125,7 +125,7 @@ const NewsItem: React.FC<NewsItemProps> = ({ item, index }) => {
 };
 
 export const RefBasedIndicatorExample: React.FC = () => {
-  const flashListRef = useRef<FlashList<DataItem>>(null);
+  const flashListRef = useRef<FlashListRef<DataItem>>(null);
   const [currentIndex] = useState(0);
 
   // refを使って定期的に現在のインデックスを更新
@@ -196,7 +196,6 @@ export const RefBasedIndicatorExample: React.FC = () => {
         ref={flashListRef}
         data={DATA}
         renderItem={({ item, index }) => <NewsItem item={item} index={index} />}
-        estimatedItemSize={140}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
       />

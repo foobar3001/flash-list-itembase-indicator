@@ -1,5 +1,7 @@
-import ViewabilityManager from "../viewability/ViewabilityManager";
+import { ErrorMessages } from "../errors/ErrorMessages";
+import { WarningMessages } from "../errors/WarningMessages";
 
+import ViewabilityManager from "./viewability/ViewabilityManager";
 import { ConsecutiveNumbers } from "./helpers/ConsecutiveNumbers";
 import { RVGridLayoutManagerImpl } from "./layout-managers/GridLayoutManager";
 import {
@@ -20,13 +22,14 @@ import {
 import { RenderStackManager } from "./RenderStackManager";
 // Abstracts layout manager, render stack manager and viewability manager and generates render stack (progressively on load)
 export class RecyclerViewManager<T> {
-  private initialDrawBatchSize = 1;
+  private initialDrawBatchSize = 2;
   private engagedIndicesTracker: RVEngagedIndicesTracker;
   private renderStackManager: RenderStackManager;
   private layoutManager?: RVLayoutManager;
   // Map of index to key
   private isFirstLayoutComplete = false;
   private hasRenderedProgressively = false;
+  private progressiveRenderCount = 0;
   private propsRef: RecyclerViewProps<T>;
   private itemViewabilityManager: ViewabilityManager<T>;
   private _isDisposed = false;
@@ -35,6 +38,7 @@ export class RecyclerViewManager<T> {
 
   public firstItemOffset = 0;
   public ignoreScrollEvents = false;
+  public isFirstPaintOnUiComplete = false;
 
   public get animationOptimizationsEnabled() {
     return this._animationOptimizationsEnabled;
@@ -53,8 +57,12 @@ export class RecyclerViewManager<T> {
     return this._isDisposed;
   }
 
+  public get numColumns() {
+    return this.propsRef.numColumns ?? 1;
+  }
+
   constructor(props: RecyclerViewProps<T>) {
-    this.getStableId = this.getStableId.bind(this);
+    this.getDataKey = this.getDataKey.bind(this);
     this.getItemType = this.getItemType.bind(this);
     this.overrideItemLayout = this.overrideItemLayout.bind(this);
     this.propsRef = props;
@@ -63,12 +71,13 @@ export class RecyclerViewManager<T> {
       props.maxItemsInRecyclePool
     );
     this.itemViewabilityManager = new ViewabilityManager<T>(this as any);
+    this.checkPropsAndWarn();
   }
 
   // updates render stack based on the engaged indices which are sorted. Recycles unused keys.
   private updateRenderStack = (engagedIndices: ConsecutiveNumbers): void => {
     this.renderStackManager.sync(
-      this.getStableId,
+      this.getDataKey,
       this.getItemType,
       engagedIndices,
       this.getDataLength()
@@ -87,11 +96,6 @@ export class RecyclerViewManager<T> {
     this.propsRef = props;
     this.engagedIndicesTracker.drawDistance =
       props.drawDistance ?? this.engagedIndicesTracker.drawDistance;
-    if (this.propsRef.drawDistance === 0) {
-      this.initialDrawBatchSize = 1;
-    } else {
-      this.initialDrawBatchSize = (props.numColumns ?? 1) * 2;
-    }
     this.initialDrawBatchSize =
       this.propsRef.overrideProps?.initialDrawBatchSize ??
       this.initialDrawBatchSize;
@@ -131,9 +135,7 @@ export class RecyclerViewManager<T> {
 
   getLayout(index: number) {
     if (!this.layoutManager) {
-      throw new Error(
-        "LayoutManager is not initialized, layout info is unavailable"
-      );
+      throw new Error(ErrorMessages.layoutManagerNotInitializedLayoutInfo);
     }
     return this.layoutManager.getLayout(index);
   }
@@ -152,9 +154,7 @@ export class RecyclerViewManager<T> {
   // Doesn't include header / foot etc
   getChildContainerDimensions() {
     if (!this.layoutManager) {
-      throw new Error(
-        "LayoutManager is not initialized, child container layout is unavailable"
-      );
+      throw new Error(ErrorMessages.layoutManagerNotInitializedChildContainer);
     }
     return this.layoutManager.getLayoutSize();
   }
@@ -165,9 +165,7 @@ export class RecyclerViewManager<T> {
 
   getWindowSize() {
     if (!this.layoutManager) {
-      throw new Error(
-        "LayoutManager is not initialized, window size is unavailable"
-      );
+      throw new Error(ErrorMessages.layoutManagerNotInitializedWindowSize);
     }
     return this.layoutManager.getWindowsSize();
   }
@@ -211,9 +209,7 @@ export class RecyclerViewManager<T> {
       Boolean(this.layoutManager?.isHorizontal()) !==
         Boolean(this.propsRef.horizontal)
     ) {
-      throw new Error(
-        "Horizontal prop cannot be toggled, you can use a key on FlashList to recreate it."
-      );
+      throw new Error(ErrorMessages.horizontalPropCannotBeToggled);
     }
     if (this._isLayoutManagerDirty) {
       this.layoutManager = undefined;
@@ -221,7 +217,7 @@ export class RecyclerViewManager<T> {
     }
     const layoutManagerParams: LayoutParams = {
       windowSize,
-      maxColumns: this.propsRef.numColumns ?? 1,
+      maxColumns: this.numColumns,
       horizontal: Boolean(this.propsRef.horizontal),
       optimizeItemArrangement: this.propsRef.optimizeItemArrangement ?? true,
       overrideItemLayout: this.overrideItemLayout,
@@ -245,9 +241,7 @@ export class RecyclerViewManager<T> {
 
   computeVisibleIndices() {
     if (!this.layoutManager) {
-      throw new Error(
-        "LayoutManager is not initialized, visible indices are not unavailable"
-      );
+      throw new Error(ErrorMessages.layoutManagerNotInitializedVisibleIndices);
     }
     return this.engagedIndicesTracker.computeVisibleIndices(this.layoutManager);
   }
@@ -270,6 +264,9 @@ export class RecyclerViewManager<T> {
       return [true, undefined];
     }
     if (this.hasRenderedProgressively) {
+      if (!this.isFirstPaintOnUiComplete) {
+        return [false, undefined];
+      }
       const newEngagedIndices = this.recomputeEngagedIndices();
       return [newEngagedIndices !== undefined, newEngagedIndices];
     } else {
@@ -299,7 +296,7 @@ export class RecyclerViewManager<T> {
   processDataUpdate() {
     if (this.hasLayout()) {
       this.modifyChildrenLayout([], this.propsRef.data?.length ?? 0);
-      if (!this.recomputeEngagedIndices()) {
+      if (this.hasRenderedProgressively && !this.recomputeEngagedIndices()) {
         // recomputeEngagedIndices will update the render stack if there are any changes in the engaged indices.
         // It's important to update render stack so that elements are assgined right keys incase items were deleted.
         this.updateRenderStack(this.engagedIndicesTracker.getEngagedIndices());
@@ -347,17 +344,28 @@ export class RecyclerViewManager<T> {
     return this.propsRef.data?.length ?? 0;
   }
 
+  hasStableDataKeys() {
+    return Boolean(this.propsRef.keyExtractor);
+  }
+
+  getDataKey(index: number): string {
+    return (
+      this.propsRef.keyExtractor?.(this.propsRef.data![index], index) ??
+      index.toString()
+    );
+  }
+
   private getLayoutManagerClass() {
     // throw errors for incompatible props
     if (this.propsRef.masonry && this.propsRef.horizontal) {
-      throw new Error("Masonry and horizontal props are incompatible");
+      throw new Error(ErrorMessages.masonryAndHorizontalIncompatible);
     }
-    if ((this.propsRef.numColumns ?? 1) > 1 && this.propsRef.horizontal) {
-      throw new Error("numColumns and horizontal props are incompatible");
+    if (this.numColumns > 1 && this.propsRef.horizontal) {
+      throw new Error(ErrorMessages.numColumnsAndHorizontalIncompatible);
     }
     return this.propsRef.masonry
       ? RVMasonryLayoutManagerImpl
-      : (this.propsRef.numColumns ?? 1) > 1 && !this.propsRef.horizontal
+      : this.numColumns > 1 && !this.propsRef.horizontal
       ? RVGridLayoutManagerImpl
       : RVLinearLayoutManagerImpl;
   }
@@ -393,6 +401,7 @@ export class RecyclerViewManager<T> {
   }
 
   private renderProgressively() {
+    this.progressiveRenderCount++;
     const layoutManager = this.layoutManager;
     if (layoutManager) {
       this.applyInitialScrollAdjustment();
@@ -408,16 +417,20 @@ export class RecyclerViewManager<T> {
         this.isFirstLayoutComplete = true;
       }
 
+      const batchSize =
+        this.numColumns *
+        this.initialDrawBatchSize ** Math.ceil(this.progressiveRenderCount / 5);
+
       // If everything is measured then render stack will be in sync. The buffer items will get rendered in the next update
       // triggered by the useOnLoad hook.
       !this.hasRenderedProgressively &&
         this.updateRenderStack(
-          // pick first n indices from visible ones and n is size of renderStack
+          // pick first n indices from visible ones based on batch size
           visibleIndices.slice(
             0,
             Math.min(
               visibleIndices.length,
-              this.getRenderStack().size + this.initialDrawBatchSize
+              this.getRenderStack().size + batchSize
             )
           )
         );
@@ -431,20 +444,19 @@ export class RecyclerViewManager<T> {
     ).toString();
   }
 
-  private getStableId(index: number): string {
-    return (
-      this.propsRef.keyExtractor?.(this.propsRef.data![index], index) ??
-      index.toString()
-    );
-  }
-
   private overrideItemLayout(index: number, layout: SpanSizeInfo) {
     this.propsRef?.overrideItemLayout?.(
       layout,
       this.propsRef.data![index],
       index,
-      this.propsRef.numColumns ?? 1,
+      this.numColumns,
       this.propsRef.extraData
     );
+  }
+
+  private checkPropsAndWarn() {
+    if (this.propsRef.onStartReached && !this.propsRef.keyExtractor) {
+      console.warn(WarningMessages.keyExtractorNotDefinedForMVCP);
+    }
   }
 }
