@@ -34,8 +34,8 @@ import { CustomIndicatorExample } from "./CustomIndicatorExample";
 import { RefBasedIndicatorExample } from "./RefBasedIndicatorExample";
 import { IndicatorComparisonExample } from "./IndicatorComparisonExample";
 import EnhancedOffsetCorrectionExample from "./EnhancedOffsetCorrectionExample";
-import { StickyHeaderExample } from "./StickyHeaderExample";
 import LotOfItems from "./lot-of-items/LotOfItems";
+import { StickyHeaderExample } from "./StickyHeaderExample";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
