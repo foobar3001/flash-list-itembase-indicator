@@ -36,7 +36,7 @@ export const RenderTargetOptions: Record<string, RenderTarget> = {
 };
 
 export type ListRenderItem<TItem> = (
-  info: ListRenderItemInfo<TItem>
+  info: ListRenderItemInfo<TItem>,
 ) => React.ReactElement | null;
 
 export interface ViewabilityConfigCallbackPair<TItem> {
@@ -238,7 +238,7 @@ export interface FlashListProps<TItem>
   getItemType?: (
     item: TItem,
     index: number,
-    extraData?: any
+    extraData?: any,
   ) => string | number | undefined;
 
   /**
@@ -254,7 +254,7 @@ export interface FlashListProps<TItem>
     item: TItem,
     index: number,
     maxColumns: number,
-    extraData?: any
+    extraData?: any,
   ) => void;
 
   /**
@@ -367,4 +367,47 @@ export interface FlashListProps<TItem>
   onCommitLayoutEffect?: () => void;
 
   onEngagedIndicesChanged?: (startIndex: number, endIndex: number) => void;
+
+  /**
+   * Callback invoked when the currently displayed sticky header changes.
+   * Receives the current sticky header index and the previous sticky header index.
+   * This is useful for tracking which header is currently stuck at the top while scrolling.
+   * The index refers to the position of the item in your data array that's being used as a sticky header.
+   */
+  onChangeStickyIndex?: (current: number, previous: number) => void;
+
+  stickyHeaderConfig?:
+    | {
+        /**
+         * If true, the sticky headers will use native driver for animations.
+         * @default true
+         */
+        useNativeDriver?: boolean;
+
+        /**
+         * Offset from the top of the list where sticky headers should stick.
+         * This is useful when you have a fixed header or navigation bar at the top of your screen
+         * and want sticky headers to appear below it instead of at the very top.
+         * @default 0
+         */
+        offset?: number;
+
+        /**
+         * Component to render behind sticky headers (e.g., a backdrop or blur effect).
+         * Renders in front of the scroll view content but behind the sticky header itself.
+         * Useful for creating visual separation or effects like backgrounds with blur.
+         */
+        backdropComponent?:
+          | React.ComponentType<any>
+          | React.ReactElement
+          | null
+          | undefined;
+
+        /**
+         * When a sticky header is displayed, the cell associated with it is hidden.
+         * @default false
+         */
+        hideRelatedCell?: boolean;
+      }
+    | undefined;
 }

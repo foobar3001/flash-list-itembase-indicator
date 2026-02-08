@@ -290,7 +290,8 @@ export class RecyclerViewManager<T> {
   }
 
   recomputeViewableItems() {
-    this.itemViewabilityManager.recomputeViewableItems();
+    this.itemViewabilityManager.clearLastReportedViewableIndices();
+    this.computeItemViewability();
   }
 
   processDataUpdate() {

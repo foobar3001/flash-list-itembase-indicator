@@ -34,6 +34,8 @@ import { CustomIndicatorExample } from "./CustomIndicatorExample";
 import { RefBasedIndicatorExample } from "./RefBasedIndicatorExample";
 import { IndicatorComparisonExample } from "./IndicatorComparisonExample";
 import EnhancedOffsetCorrectionExample from "./EnhancedOffsetCorrectionExample";
+import { StickyHeaderExample } from "./StickyHeaderExample";
+import LotOfItems from "./lot-of-items/LotOfItems";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -103,6 +105,16 @@ const NavigationTree = () => {
             name="ShowcaseApp"
             component={ShowcaseApp}
             options={{ title: "Showcase App" }}
+          />
+          <Stack.Screen
+            name="LotOfItems"
+            component={LotOfItems}
+            options={{ title: "Lot of Items" }}
+          />
+          <Stack.Screen
+            name="StickyHeaderExample"
+            component={StickyHeaderExample}
+            options={{ title: "Sticky Headers" }}
           />
         </Stack.Group>
         <Stack.Screen name="Masonry" component={Masonry} />
