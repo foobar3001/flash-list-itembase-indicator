@@ -34,6 +34,7 @@ export type RootStackParamList = {
   ShowcaseApp: undefined;
   CustomIndicatorExample: undefined;
   RefBasedIndicatorExample: undefined;
+  EnhancedOffsetCorrectionExample: undefined;
   IndicatorComparisonExample: undefined;
   LotOfItems: undefined;
   ManualBenchmarkExample: undefined;

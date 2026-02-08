@@ -119,6 +119,10 @@ export const ExamplesScreen = () => {
       destination: "RefBasedIndicatorExample",
     },
     {
+      title: "Enhanced Offset Correction Example",
+      destination: "EnhancedOffsetCorrectionExample",
+    },
+    {
       title: "Indicator Comparison Example",
       destination: "IndicatorComparisonExample",
     },

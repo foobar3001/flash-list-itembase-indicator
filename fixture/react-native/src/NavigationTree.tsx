@@ -33,6 +33,7 @@ import ManualFlatListBenchmarkExample from "./ManualFlatListBenchmarkExample";
 import { CustomIndicatorExample } from "./CustomIndicatorExample";
 import { RefBasedIndicatorExample } from "./RefBasedIndicatorExample";
 import { IndicatorComparisonExample } from "./IndicatorComparisonExample";
+import EnhancedOffsetCorrectionExample from "./EnhancedOffsetCorrectionExample";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -131,6 +132,11 @@ const NavigationTree = () => {
           name="RefBasedIndicatorExample"
           component={RefBasedIndicatorExample}
           options={{ title: "Ref-Based Indicator Example" }}
+        />
+        <Stack.Screen
+          name="EnhancedOffsetCorrectionExample"
+          component={EnhancedOffsetCorrectionExample}
+          options={{ title: "Enhanced Offset Correction Example" }}
         />
         <Stack.Screen
           name="IndicatorComparisonExample"
