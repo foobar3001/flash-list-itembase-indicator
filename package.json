@@ -16,10 +16,6 @@
   "publishConfig": {
     "@foobar3001:registry": "https://npm.pkg.github.com/"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Shopify/flash-list"
-  },
   "description": "FlashList is a more performant FlatList replacement",
   "author": "shopify",
   "license": "MIT",
