@@ -1,0 +1,71 @@
+name: VersionUp
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "Version bump type"
+                required: true
+                default: "patch"
+                type: choice
+                options:
+                    - patch
+                    - minor
+                    - major
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+
+        outputs:
+            new_version: ${{ steps.version.outputs.new_version }}
+
+        permissions:
+            contents: write
+            packages: write
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version-file: ".nvmrc"
+                  cache: "yarn"
+                  registry-url: "https://npm.pkg.github.com"
+                  scope: "@foobar3001"
+            - name: Configure git
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+
+            - name: Install dependencies
+              run: |
+                  yarn install --frozen-lockfile
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Bump version
+              run: |
+                  yarn version --${{ github.event.inputs.version }} --no-git-tag-version
+
+            - name: Get new version
+              id: version
+              run: echo "new_version=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+            - name: Commit changes
+              run: |
+                  git add .
+                  git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }}"
+
+            - name: Create tag
+              run: |
+                  git tag ${{ steps.version.outputs.new_version }}
+
+            - name: Push changes
+              run: |
+                  git push origin main
+                  git push origin ${{ steps.version.outputs.new_version }}
