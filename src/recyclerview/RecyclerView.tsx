@@ -233,10 +233,19 @@ const RecyclerViewComponent = <T,>(
       console.warn(WarningMessages.exceededMaxRendersWithoutCommit);
     }
 
-    if (
-      recyclerViewManager.modifyChildrenLayout(layoutInfo, data?.length ?? 0) &&
-      !hasExceededMaxRendersWithoutCommit
-    ) {
+    const [result, engagedIndices] = recyclerViewManager.modifyChildrenLayout(
+      layoutInfo,
+      data?.length ?? 0
+    );
+
+    if (result && !hasExceededMaxRendersWithoutCommit) {
+      if (engagedIndices) {
+        props.onEngagedIndicesChanged?.(
+          engagedIndices.startIndex,
+          engagedIndices.endIndex
+        );
+      }
+
       // Trigger re-render if layout modifications were made
       setRenderId((prev) => prev + 1);
     } else {
@@ -295,7 +304,15 @@ const RecyclerViewComponent = <T,>(
             recyclerViewManager.resetVelocityCompute();
           }
           // Update scroll position and trigger re-render if needed
-          if (recyclerViewManager.updateScrollOffset(scrollOffset, velocity)) {
+          const newEngagedIndices = recyclerViewManager.updateScrollOffset(
+            scrollOffset,
+            velocity
+          );
+          if (newEngagedIndices) {
+            props.onEngagedIndicesChanged?.(
+              newEngagedIndices.startIndex,
+              newEngagedIndices.endIndex
+            );
             setRenderId((prev) => prev + 1);
           }
         }

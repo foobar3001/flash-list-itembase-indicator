@@ -34,6 +34,10 @@ export type RootStackParamList = {
   Carousel: undefined;
   LayoutOptions: undefined;
   ShowcaseApp: undefined;
+  CustomIndicatorExample: undefined;
+  RefBasedIndicatorExample: undefined;
+  EnhancedOffsetCorrectionExample: undefined;
+  IndicatorComparisonExample: undefined;
   LotOfItems: undefined;
   ManualBenchmarkExample: undefined;
   ManualFlatListBenchmarkExample: undefined;

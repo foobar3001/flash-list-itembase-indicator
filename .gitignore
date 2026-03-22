@@ -195,6 +195,12 @@ dist
 # TernJS port file
 .tern-port
 
+fixture/**/*e2e.*
+fixture/**/*.d.ts
+fixture/**/*.d.ts.map
+fixture/**/*.js
+fixture/**/*.js.map
+
 **/.DS_Store
 
 website/.tweet-cache

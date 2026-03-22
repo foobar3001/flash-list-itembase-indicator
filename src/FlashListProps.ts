@@ -36,7 +36,7 @@ export const RenderTargetOptions: Record<string, RenderTarget> = {
 };
 
 export type ListRenderItem<TItem> = (
-  info: ListRenderItemInfo<TItem>
+  info: ListRenderItemInfo<TItem>,
 ) => React.ReactElement | null;
 
 export interface ViewabilityConfigCallbackPair<TItem> {
@@ -262,7 +262,7 @@ export interface FlashListProps<TItem>
   getItemType?: (
     item: TItem,
     index: number,
-    extraData?: any
+    extraData?: any,
   ) => string | number | undefined;
 
   /**
@@ -278,7 +278,7 @@ export interface FlashListProps<TItem>
     item: TItem,
     index: number,
     maxColumns: number,
-    extraData?: any
+    extraData?: any,
   ) => void;
 
   /**
@@ -414,6 +414,8 @@ export interface FlashListProps<TItem>
    * Doing set state inside the callback can lead to infinite loops. Make sure FlashList's props are memoized.
    */
   onCommitLayoutEffect?: () => void;
+
+  onEngagedIndicesChanged?: (startIndex: number, endIndex: number) => void;
 
   /**
    * Callback invoked when the currently displayed sticky header changes.
