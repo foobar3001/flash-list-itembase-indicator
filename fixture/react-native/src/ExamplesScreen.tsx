@@ -123,6 +123,22 @@ export const ExamplesScreen = () => {
       title: "Grid with Separator",
       destination: "GridWithSeparator",
     },
+    {
+      title: "Custom Indicator Example",
+      destination: "CustomIndicatorExample",
+    },
+    {
+      title: "Ref-Based Indicator Example",
+      destination: "RefBasedIndicatorExample",
+    },
+    {
+      title: "Enhanced Offset Correction Example",
+      destination: "EnhancedOffsetCorrectionExample",
+    },
+    {
+      title: "Indicator Comparison Example",
+      destination: "IndicatorComparisonExample",
+    },
   ];
   return (
     <>

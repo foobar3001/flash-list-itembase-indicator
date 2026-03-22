@@ -30,9 +30,13 @@ import MovieList from "./MovieList";
 import Carousel from "./Carousel";
 import { LayoutOptions } from "./LayoutOptions";
 import ShowcaseApp from "./ShowcaseApp";
-import LotOfItems from "./lot-of-items/LotOfItems";
 import ManualBenchmarkExample from "./ManualBenchmarkExample";
 import ManualFlatListBenchmarkExample from "./ManualFlatListBenchmarkExample";
+import { CustomIndicatorExample } from "./CustomIndicatorExample";
+import { RefBasedIndicatorExample } from "./RefBasedIndicatorExample";
+import { IndicatorComparisonExample } from "./IndicatorComparisonExample";
+import EnhancedOffsetCorrectionExample from "./EnhancedOffsetCorrectionExample";
+import LotOfItems from "./lot-of-items/LotOfItems";
 import { StickyHeaderExample } from "./StickyHeaderExample";
 import { GridWithSeparator } from "./GridWithSeparator";
 
@@ -148,6 +152,26 @@ const NavigationTree = () => {
           name="ManualFlatListBenchmarkExample"
           component={ManualFlatListBenchmarkExample}
           options={{ title: "Manual Flat List Benchmark Example" }}
+        />
+        <Stack.Screen
+          name="CustomIndicatorExample"
+          component={CustomIndicatorExample}
+          options={{ title: "Custom Indicator Example" }}
+        />
+        <Stack.Screen
+          name="RefBasedIndicatorExample"
+          component={RefBasedIndicatorExample}
+          options={{ title: "Ref-Based Indicator Example" }}
+        />
+        <Stack.Screen
+          name="EnhancedOffsetCorrectionExample"
+          component={EnhancedOffsetCorrectionExample}
+          options={{ title: "Enhanced Offset Correction Example" }}
+        />
+        <Stack.Screen
+          name="IndicatorComparisonExample"
+          component={IndicatorComparisonExample}
+          options={{ title: "Indicator Comparison Example" }}
         />
         <Stack.Group screenOptions={{ presentation: "modal" }}>
           <Stack.Screen name="Debug" component={DebugScreen} />
