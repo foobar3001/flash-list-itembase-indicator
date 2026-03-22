@@ -1,5 +1,5 @@
 {
-  "name": "@shopify/flash-list",
+  "name": "@foobar3001/flash-list-itembase-indicator",
   "version": "2.3.0",
   "keywords": [
     "react-native",
@@ -14,8 +14,7 @@
     "performance"
   ],
   "publishConfig": {
-    "access": "public",
-    "@shopify:registry": "https://registry.npmjs.org/"
+    "@foobar3001:registry": "https://npm.pkg.github.com/"
   },
   "repository": {
     "type": "git",
