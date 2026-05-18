@@ -123,6 +123,30 @@ describe("LinearLayoutManager", () => {
   });
 
   describe("Layout modifications", () => {
+    it("should use preloaded height before measurement and seed future estimates", () => {
+      const manager = createLayoutManager(LayoutManagerType.LINEAR, {
+        ...defaultParams,
+        getPreloadedHeight: (index) => (index === 0 ? 120 : undefined),
+      });
+      manager.modifyLayout([], 2);
+      const layouts = getAllLayouts(manager);
+
+      expect(layouts[0].height).toBe(120);
+      expect(layouts[0].isHeightMeasured).toBe(true);
+      expect(layouts[1].height).toBe(120);
+    });
+
+    it("should prefer real measured height over preloaded height", () => {
+      const manager = createLayoutManager(LayoutManagerType.LINEAR, {
+        ...defaultParams,
+        getPreloadedHeight: () => 120,
+      });
+      manager.modifyLayout([], 1);
+      manager.modifyLayout([createMockLayoutInfo(0, 400, 180)], 1);
+
+      expect(manager.getLayout(0).height).toBe(180);
+    });
+
     it("should update layout when items are added", () => {
       const manager = createPopulatedLayoutManager(
         LayoutManagerType.LINEAR,

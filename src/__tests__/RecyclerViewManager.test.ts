@@ -71,4 +71,32 @@ describe("RecyclerViewManager", () => {
       expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
   });
+
+  describe("getItemHeight wiring", () => {
+    const createMockProps = (overrides = {}) =>
+      ({
+        data: [{ id: 1 }, { id: 2 }],
+        renderItem: jest.fn(),
+        ...overrides,
+      } as FlashListProps<unknown>);
+
+    it("should pass item, index, and extraData to getItemHeight", () => {
+      const data = [{ id: 1 }, { id: 2 }];
+      const extraData = { source: "cache" };
+      const getItemHeight = jest.fn(() => 100);
+      const manager = new RecyclerViewManager(
+        createMockProps({
+          data,
+          extraData,
+          getItemHeight,
+        })
+      );
+
+      manager.updateLayoutParams({ width: 400, height: 800 }, 0);
+      manager.modifyChildrenLayout([], data.length);
+
+      expect(getItemHeight).toHaveBeenCalledWith(data[0], 0, extraData);
+      expect(getItemHeight).toHaveBeenCalledWith(data[1], 1, extraData);
+    });
+  });
 });

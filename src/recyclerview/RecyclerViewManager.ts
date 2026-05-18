@@ -228,6 +228,12 @@ export class RecyclerViewManager<T> {
       optimizeItemArrangement: this.propsRef.optimizeItemArrangement ?? true,
       overrideItemLayout: this.overrideItemLayout,
       getItemType: this.getItemType,
+      getPreloadedHeight: (index: number) =>
+        this.propsRef.getItemHeight?.(
+          this.propsRef.data![index],
+          index,
+          this.propsRef.extraData
+        ),
     };
     if (!(this.layoutManager instanceof LayoutManagerClass)) {
       // console.log("-----> new LayoutManagerClass");

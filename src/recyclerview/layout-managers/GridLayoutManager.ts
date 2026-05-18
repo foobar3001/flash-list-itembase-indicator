@@ -73,7 +73,9 @@ export class RVGridLayoutManagerImpl extends RVLayoutManager {
   estimateLayout(index: number) {
     const layout = this.layouts[index];
     layout.width = this.getWidth(index);
-    layout.height = this.getEstimatedHeight(index);
+    if (!layout.isHeightMeasured) {
+      layout.height = this.getEstimatedHeight(index);
+    }
 
     layout.isWidthMeasured = true;
     layout.enforcedWidth = true;
