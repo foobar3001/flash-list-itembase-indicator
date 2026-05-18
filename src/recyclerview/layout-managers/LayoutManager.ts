@@ -34,6 +34,8 @@ export abstract class RVLayoutManager {
   private overrideItemLayout: (index: number, layout: SpanSizeInfo) => void;
   /** Optional function to determine item type */
   private getItemType: (index: number) => string;
+  /** Optional callback to retrieve preloaded height for an item */
+  private getPreloadedHeight?: (index: number) => number | undefined;
   /** Window for tracking average heights by item type */
   private heightAverageWindow: MultiTypeAverageWindow;
   /** Window for tracking average widths by item type */
@@ -58,6 +60,7 @@ export abstract class RVLayoutManager {
     this.heightAverageWindow = new MultiTypeAverageWindow(5, 200);
     this.widthAverageWindow = new MultiTypeAverageWindow(5, 200);
     this.getItemType = params.getItemType;
+    this.getPreloadedHeight = params.getPreloadedHeight;
     this.overrideItemLayout = params.overrideItemLayout;
     this.layouts = previousLayoutManager?.layouts ?? [];
     if (previousLayoutManager) {
@@ -198,8 +201,14 @@ export abstract class RVLayoutManager {
       this.layouts.length = totalItemCount;
       this.spanTracker.length = totalItemCount;
       for (let i = startIndex; i < totalItemCount; i++) {
-        this.getLayout(i);
+        const layout = this.getLayout(i);
         this.getSpan(i);
+        if (layout.isHeightMeasured) {
+          this.heightAverageWindow.addValue(layout.height, this.getItemType(i));
+        }
+        if (layout.isWidthMeasured) {
+          this.widthAverageWindow.addValue(layout.width, this.getItemType(i));
+        }
       }
       this.recomputeLayouts(startIndex, totalItemCount - 1);
     }
@@ -242,6 +251,7 @@ export abstract class RVLayoutManager {
       };
       this.layouts[index] = layout;
     }
+    this.applyPreloadedHeight(index, layout);
     if (!layout.isWidthMeasured || !layout.isHeightMeasured) {
       this.estimateLayout(index);
     }
@@ -258,6 +268,7 @@ export abstract class RVLayoutManager {
     this.maxColumns = params.maxColumns ?? this.maxColumns;
     this.optimizeItemArrangement =
       params.optimizeItemArrangement ?? this.optimizeItemArrangement;
+    this.getPreloadedHeight = params.getPreloadedHeight;
   }
 
   getLayoutCount(): number {
@@ -420,6 +431,15 @@ export abstract class RVLayoutManager {
     }
     return minIndexWithChangedSpan;
   }
+
+  private applyPreloadedHeight(index: number, layout: RVLayout) {
+    const preloadedHeight = this.getPreloadedHeight?.(index);
+    if (preloadedHeight === undefined || layout.isHeightMeasured) {
+      return;
+    }
+    layout.height = preloadedHeight;
+    layout.isHeightMeasured = true;
+  }
 }
 
 /**
@@ -455,6 +475,12 @@ export interface LayoutParams {
    * Allows custom control over span and size for individual items
    */
   overrideItemLayout: (index: number, layout: SpanSizeInfo) => void;
+
+  /**
+   * Callback to provide preloaded height values before actual on-screen
+   * measurement is available.
+   */
+  getPreloadedHeight?: (index: number) => number | undefined;
 
   /**
    * Function to determine the type of an item at a specific index

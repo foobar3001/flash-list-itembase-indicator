@@ -266,6 +266,21 @@ export interface FlashListProps<TItem>
   ) => string | number | undefined;
 
   /**
+   * Fast callback to provide pre-measured height from an external cache, prior
+   * render, or server metadata.
+   *
+   * The returned height is provisional and can be replaced by actual on-screen
+   * measurement when available.
+   *
+   * Performance: This method is called very frequently. Keep it fast.
+   */
+  getItemHeight?: (
+    item: TItem,
+    index: number,
+    extraData?: any
+  ) => number | undefined;
+
+  /**
    * This method can be used to change column span of an item.
    * Changing item span is useful when you have grid layouts (numColumns > 1) and you want few items to be bigger than the rest.
    *

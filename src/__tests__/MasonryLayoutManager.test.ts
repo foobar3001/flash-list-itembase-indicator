@@ -98,6 +98,19 @@ describe("MasonryLayoutManager", () => {
   });
 
   describe("Layout Modifications", () => {
+    it("should use preloaded heights before measurement", () => {
+      const manager = createLayoutManager(LayoutManagerType.MASONRY, {
+        ...defaultParams,
+        getPreloadedHeight: (index) => (index === 0 ? 110 : undefined),
+      });
+
+      manager.modifyLayout([], 3);
+      const layouts = getAllLayouts(manager);
+
+      expect(layouts[0].height).toBe(110);
+      expect(layouts[2].y).toBe(110);
+    });
+
     it("should update layout when items are added", () => {
       const manager = createLayoutManager(
         LayoutManagerType.MASONRY,

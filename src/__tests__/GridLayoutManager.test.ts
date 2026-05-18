@@ -3,6 +3,7 @@ import {
   getAllLayouts,
   LayoutManagerType,
   createLayoutParams,
+  createLayoutManager,
 } from "./helpers/createLayoutManager";
 
 describe("GridLayoutManager", () => {
@@ -75,6 +76,19 @@ describe("GridLayoutManager", () => {
   });
 
   describe("Layout recalculations", () => {
+    it("should use preloaded heights to lay out rows before measurement", () => {
+      const manager = createLayoutManager(LayoutManagerType.GRID, {
+        ...defaultParams,
+        getPreloadedHeight: (index) => (index === 0 ? 140 : undefined),
+      });
+
+      manager.modifyLayout([], 4);
+      const layouts = getAllLayouts(manager);
+
+      expect(layouts[0].height).toBe(140);
+      expect(layouts[2].y).toBe(140);
+    });
+
     it("should adjust layout when window size changes", () => {
       const manager = createPopulatedLayoutManager(
         LayoutManagerType.GRID,

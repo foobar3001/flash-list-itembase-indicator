@@ -80,12 +80,18 @@ export class RVLinearLayoutManagerImpl extends RVLayoutManager {
    */
   estimateLayout(index: number) {
     const layout = this.layouts[index];
-    layout.width = this.horizontal
-      ? this.getEstimatedWidth(index)
-      : this.boundedSize;
-    layout.height = this.getEstimatedHeight(index);
-    layout.isWidthMeasured = !this.horizontal;
-    layout.enforcedWidth = !this.horizontal;
+    if (!layout.isWidthMeasured) {
+      layout.width = this.horizontal
+        ? this.getEstimatedWidth(index)
+        : this.boundedSize;
+    }
+    if (!layout.isHeightMeasured) {
+      layout.height = this.getEstimatedHeight(index);
+    }
+    if (!this.horizontal) {
+      layout.isWidthMeasured = true;
+      layout.enforcedWidth = true;
+    }
   }
 
   /**
